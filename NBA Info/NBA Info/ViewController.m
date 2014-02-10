@@ -116,10 +116,12 @@
 
 //Get the data from SQLite database
 -(void)dataToQuery{
-    const char *dbpath = [SQLPath UTF8String];
-    sqlite3_stmt    *statement;
     
-    if (sqlite3_open(dbpath, &SQLinfo) == SQLITE_OK)
+    //Get SQLite file
+    const char *DatabasePath = [SQLPath UTF8String];
+    sqlite3_stmt *SQLStatement;
+    
+    if (sqlite3_open(DatabasePath, &SQLinfo) == SQLITE_OK)
     {
         //String from East West selector
         EWTxt = [NSString stringWithFormat: @"%@",[EWSelect titleForSegmentAtIndex:EWSelect.selectedSegmentIndex]];
@@ -128,26 +130,25 @@
         
         const char *query_stmt = [querySQL UTF8String];
         
-        if (sqlite3_prepare_v2(SQLinfo,
-                               query_stmt, -1, &statement, NULL) == SQLITE_OK)
+        if (sqlite3_prepare_v2(SQLinfo,query_stmt, -1, &SQLStatement, NULL) == SQLITE_OK)
         {
-            if (sqlite3_step(statement) == SQLITE_ROW)
+            if (sqlite3_step(SQLStatement) == SQLITE_ROW)
             {
-                ABBREVIATION = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(statement, 1)];
-                FULLNAME = [[NSString alloc]initWithUTF8String:(const char *) sqlite3_column_text(statement, 2)];
-                CITY = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(statement, 3)];
-                STATE = [[NSString alloc]initWithUTF8String:(const char *) sqlite3_column_text(statement, 4)];
-                DIVISION = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(statement, 5)];
-                CONFERENCE = [[NSString alloc]initWithUTF8String:(const char *) sqlite3_column_text(statement, 6)];
-                SITENAME = [[NSString alloc]initWithUTF8String:(const char *) sqlite3_column_text(statement, 7)];
+                ABBREVIATION = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(SQLStatement, 1)];
+                FULLNAME = [[NSString alloc]initWithUTF8String:(const char *) sqlite3_column_text(SQLStatement, 2)];
+                CITY = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(SQLStatement, 3)];
+                STATE = [[NSString alloc]initWithUTF8String:(const char *) sqlite3_column_text(SQLStatement, 4)];
+                DIVISION = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(SQLStatement, 5)];
+                CONFERENCE = [[NSString alloc]initWithUTF8String:(const char *) sqlite3_column_text(SQLStatement, 6)];
+                SITENAME = [[NSString alloc]initWithUTF8String:(const char *) sqlite3_column_text(SQLStatement, 7)];
                 
-                
+                //Log data retrieved from SQLite DB
                 NSLog(@"%@, %@, %@, %@, %@, %@, %@",ABBREVIATION,FULLNAME,CITY,STATE,DIVISION,CONFERENCE,SITENAME);
                 
             } else {
                 NSLog(@"NO");
             }
-            sqlite3_finalize(statement);
+            sqlite3_finalize(SQLStatement);
         }
         sqlite3_close(SQLinfo);
     }
