@@ -52,6 +52,7 @@
                     </view>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics"/>
                     <connections>
+                        <outlet property="EWSelect" destination="Wer-3e-y6O" id="bVO-ke-v5W"/>
                         <outlet property="beginQuery" destination="nVs-gb-3oo" id="UOc-fg-MAv"/>
                         <outlet property="divisionsList" destination="5F3-E6-FRL" id="00y-b7-tk1"/>
                         <outlet property="teamsList" destination="XYA-1M-twi" id="qHJ-bb-3hi"/>

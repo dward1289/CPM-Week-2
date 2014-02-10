@@ -116,29 +116,38 @@
 
 //Get the data from SQLite database
 -(void)dataToQuery{
-    //Documents directory
-    NSArray *theDirectoryPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *DocumentsDirectory = theDirectoryPaths[0];
+    const char *dbpath = [SQLPath UTF8String];
+    sqlite3_stmt    *statement;
     
-    //Path of database file created
-    SQLPath = [[NSString alloc]initWithString:[DocumentsDirectory stringByAppendingPathComponent:@"NBATeams.sqlite3"]];
-    
-    const char *DatabasePath = [SQLPath UTF8String];
-    sqlite3_stmt *SQLiteStatement;
-    
-    if(sqlite3_open(DatabasePath, &SQLinfo) == SQLITE_OK){
-        NSString *theQuery = @"SELECT * FROM TeamInfo";
-        const char *theQueryStatement = [theQuery UTF8String];
+    if (sqlite3_open(dbpath, &SQLinfo) == SQLITE_OK)
+    {
+        //String from East West selector
+        EWTxt = [NSString stringWithFormat: @"%@",[EWSelect titleForSegmentAtIndex:EWSelect.selectedSegmentIndex]];
         
-        if(sqlite3_prepare_v2(SQLinfo,theQueryStatement,-1,&SQLiteStatement,NULL) == SQLITE_OK){
-            [theTeams removeAllObjects];
-            while(sqlite3_step(SQLiteStatement) == SQLITE_ROW){
-                NSString *theInfo = [[NSString alloc] initWithUTF8String:(const char *)sqlite3_column_text(SQLiteStatement,2)];
+        NSString *querySQL = @"SELECT * FROM TeamInfo";
+        
+        const char *query_stmt = [querySQL UTF8String];
+        
+        if (sqlite3_prepare_v2(SQLinfo,
+                               query_stmt, -1, &statement, NULL) == SQLITE_OK)
+        {
+            if (sqlite3_step(statement) == SQLITE_ROW)
+            {
+                ABBREVIATION = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(statement, 1)];
+                FULLNAME = [[NSString alloc]initWithUTF8String:(const char *) sqlite3_column_text(statement, 2)];
+                CITY = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(statement, 3)];
+                STATE = [[NSString alloc]initWithUTF8String:(const char *) sqlite3_column_text(statement, 4)];
+                DIVISION = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(statement, 5)];
+                CONFERENCE = [[NSString alloc]initWithUTF8String:(const char *) sqlite3_column_text(statement, 6)];
+                SITENAME = [[NSString alloc]initWithUTF8String:(const char *) sqlite3_column_text(statement, 7)];
                 
-                [theTeams addObject:theInfo];
-                NSLog(@"count: %@", [theTeams description]);
+                
+                NSLog(@"%@, %@, %@, %@, %@, %@, %@",ABBREVIATION,FULLNAME,CITY,STATE,DIVISION,CONFERENCE,SITENAME);
+                
+            } else {
+                NSLog(@"NO");
             }
-            sqlite3_finalize(SQLiteStatement);
+            sqlite3_finalize(statement);
         }
         sqlite3_close(SQLinfo);
     }

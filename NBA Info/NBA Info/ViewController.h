@@ -14,6 +14,7 @@
     IBOutlet UIPickerView *divisionsList;
     IBOutlet UITableView *teamsList;
     IBOutlet UIButton *beginQuery;
+    IBOutlet UISegmentedControl *EWSelect;
     NSArray *divisionsItems;
     NSString *SQLPath;
     NSString *EntryAddedStatus;
@@ -26,6 +27,15 @@
     NSString* teamState;
     NSString* teamDivision;
     NSString* teamConference;
+    NSString *ABBREVIATION;
+    NSString *FULLNAME;
+    NSString *CITY;
+    NSString *STATE;
+    NSString *DIVISION;
+    NSString *CONFERENCE;
+    NSString *SITENAME;
+    NSString *EWTxt;
+    
 
 }
 
