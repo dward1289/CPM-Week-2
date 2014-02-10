@@ -37,7 +37,7 @@
     NSString *DocumentsDirectory = theDirectoryPaths[0];
     
     //Path of database file created
-    SQLPath = [[NSString alloc]initWithString:[DocumentsDirectory stringByAppendingPathComponent:@"NBATeams.db"]];
+    SQLPath = [[NSString alloc]initWithString:[DocumentsDirectory stringByAppendingPathComponent:@"NBATeams.sqlite3"]];
     
     //Create SQLite table
     NSFileManager *FileManager = [NSFileManager defaultManager];
@@ -45,7 +45,7 @@
         const char *DatabasePath = [SQLPath UTF8String];
         if(sqlite3_open(DatabasePath, &SQLinfo) == SQLITE_OK){
             char *ErrorMessage;
-            const char *SQL_STATMENT = "CREATE TABLE IF NOT EXISTS TeamInfo (ID INTEGER PRIMARY KEY AUTOINCREMENT, ABBREVIATION TEXT, FULL_NAME TEXT, CITY TEXT, STATE, DIVISION_ID INTEGER, CONFERENCE_ID INTEGER, SITE_NAME TEXT)";
+            const char *SQL_STATMENT = "CREATE TABLE IF NOT EXISTS TeamInfo (ID INTEGER PRIMARY KEY AUTOINCREMENT, ABBREVIATION TEXT, FULL_NAME TEXT, CITY TEXT, STATE, DIVISION TEXT, CONFERENCE TEXT, SITE_NAME TEXT)";
             
             if(sqlite3_exec(SQLinfo, SQL_STATMENT, NULL,NULL, &ErrorMessage)!= SQLITE_OK){
                 EntryAddedStatus = @"Unable to create table.";
@@ -65,21 +65,21 @@
     //Add data to SQLite Database
     for(NSUInteger i = 0; i < 30; i++){
         NSDictionary* nbaDictionary = [theNBAInfo objectAtIndex:i];
-        NSString* teamName = [nbaDictionary objectForKey:@"full_name"];
-        NSString* teamArena = [nbaDictionary objectForKey:@"site_name"];
-        NSString* teamAbbreviation = [nbaDictionary objectForKey:@"abbreviation"];
-        NSString* teamCity = [nbaDictionary objectForKey:@"city"];
-        NSString* teamState = [nbaDictionary objectForKey:@"state"];
-        NSString* teamDivision = [nbaDictionary objectForKey:@"division"];
-        NSString* teamConference = [nbaDictionary objectForKey:@"conference"];
+        teamName = [nbaDictionary objectForKey:@"full_name"];
+        teamArena = [nbaDictionary objectForKey:@"site_name"];
+        teamAbbreviation = [nbaDictionary objectForKey:@"abbreviation"];
+        teamCity = [nbaDictionary objectForKey:@"city"];
+        teamState = [nbaDictionary objectForKey:@"state"];
+        teamDivision = [nbaDictionary objectForKey:@"division"];
+        teamConference = [nbaDictionary objectForKey:@"conference"];
         
         sqlite3_stmt *SQLStatement;
         const char *DatabasePath = [SQLPath UTF8String];
         
         if (sqlite3_open(DatabasePath, &SQLinfo) == SQLITE_OK) {
             NSString *insertSQL = [NSString stringWithFormat:
-                                   @"INSERT INTO TeamInfo (ABBREVIATION) VALUES (\"%@\")",
-                                   teamAbbreviation];
+                                   @"INSERT INTO TeamInfo (ABBREVIATION,FULL_NAME,CITY,STATE,DIVISION,CONFERENCE,SITE_NAME) VALUES (\"%@\",\"%@\", \"%@\", \"%@\",\"%@\", \"%@\", \"%@\")",
+                                   teamAbbreviation, teamName,teamCity,teamState,teamDivision,teamConference,teamArena];
             
             const char*insert_stmt = [insertSQL UTF8String];
             sqlite3_prepare_v2(SQLinfo, insert_stmt,  -1, &SQLStatement, NULL);
@@ -97,21 +97,57 @@
 	// Do any additional setup after loading the view, typically from a nib.
     
 }
+
+//Populate picker view with Divisions.
 -(NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView
 {
-    return 1; // For one column
+    return 1;
 }
 
 -(NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component
 {
-    return [divisionsItems count]; // Numbers of rows
+    return [divisionsItems count];
 }
 
 -(NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component
 {
-    return [divisionsItems objectAtIndex:row]; // If it's a string
+    return [divisionsItems objectAtIndex:row];
 }
 
+//Get the data from SQLite database
+-(void)dataToQuery{
+    //Documents directory
+    NSArray *theDirectoryPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *DocumentsDirectory = theDirectoryPaths[0];
+    
+    //Path of database file created
+    SQLPath = [[NSString alloc]initWithString:[DocumentsDirectory stringByAppendingPathComponent:@"NBATeams.sqlite3"]];
+    
+    const char *DatabasePath = [SQLPath UTF8String];
+    sqlite3_stmt *SQLiteStatement;
+    
+    if(sqlite3_open(DatabasePath, &SQLinfo) == SQLITE_OK){
+        NSString *theQuery = @"SELECT * FROM TeamInfo";
+        const char *theQueryStatement = [theQuery UTF8String];
+        
+        if(sqlite3_prepare_v2(SQLinfo,theQueryStatement,-1,&SQLiteStatement,NULL) == SQLITE_OK){
+            [theTeams removeAllObjects];
+            while(sqlite3_step(SQLiteStatement) == SQLITE_ROW){
+                NSString *theInfo = [[NSString alloc] initWithUTF8String:(const char *)sqlite3_column_text(SQLiteStatement,2)];
+                
+                [theTeams addObject:theInfo];
+                NSLog(@"count: %@", [theTeams description]);
+            }
+            sqlite3_finalize(SQLiteStatement);
+        }
+        sqlite3_close(SQLinfo);
+    }
+}
+
+//Begin query function
+-(IBAction)onQuery:(id)sender{
+    [self dataToQuery];
+}
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];

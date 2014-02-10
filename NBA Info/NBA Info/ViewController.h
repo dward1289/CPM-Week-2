@@ -12,10 +12,23 @@
 @interface ViewController : UIViewController
 {
     IBOutlet UIPickerView *divisionsList;
+    IBOutlet UITableView *teamsList;
+    IBOutlet UIButton *beginQuery;
     NSArray *divisionsItems;
     NSString *SQLPath;
     NSString *EntryAddedStatus;
     sqlite3 *SQLinfo;
+    NSMutableArray *theTeams;
+    NSString* teamName;
+    NSString* teamArena;
+    NSString* teamAbbreviation;
+    NSString* teamCity;
+    NSString* teamState;
+    NSString* teamDivision;
+    NSString* teamConference;
 
 }
+
+-(IBAction)onQuery:(id)sender;
+-(void)dataToQuery;
 @end
