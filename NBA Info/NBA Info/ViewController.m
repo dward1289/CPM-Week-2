@@ -132,7 +132,7 @@
         
         if (sqlite3_prepare_v2(SQLinfo,query_stmt, -1, &SQLStatement, NULL) == SQLITE_OK)
         {
-            if (sqlite3_step(SQLStatement) == SQLITE_ROW)
+            while(sqlite3_step(SQLStatement) == SQLITE_ROW)
             {
                 ABBREVIATION = [[NSString alloc] initWithUTF8String:(const char *) sqlite3_column_text(SQLStatement, 1)];
                 FULLNAME = [[NSString alloc]initWithUTF8String:(const char *) sqlite3_column_text(SQLStatement, 2)];
@@ -145,8 +145,6 @@
                 //Log data retrieved from SQLite DB
                 NSLog(@"%@, %@, %@, %@, %@, %@, %@",ABBREVIATION,FULLNAME,CITY,STATE,DIVISION,CONFERENCE,SITENAME);
                 
-            } else {
-                NSLog(@"NO");
             }
             sqlite3_finalize(SQLStatement);
         }
