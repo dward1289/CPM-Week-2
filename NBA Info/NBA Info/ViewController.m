@@ -126,7 +126,7 @@
         //String from East West selector
         EWTxt = [NSString stringWithFormat: @"%@",[EWSelect titleForSegmentAtIndex:EWSelect.selectedSegmentIndex]];
         
-        NSString *querySQL = @"SELECT * FROM TeamInfo";
+        NSString *querySQL = [NSString stringWithFormat:@"SELECT * FROM TeamInfo WHERE CONFERENCE='%@'",EWTxt];
         
         const char *query_stmt = [querySQL UTF8String];
         
