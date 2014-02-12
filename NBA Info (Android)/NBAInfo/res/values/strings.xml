@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">NBA Info</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string-array name="Divisions">
+        <item>Southeast</item>
+        <item>Atlantic</item>
+		<item>Central</item>
+		<item>Southwest</item>
+		<item>Northwest</item>
+		<item>Pacific</item>
+    </string-array>
+    <string name="east">East</string>
+    <string name="west">West</string>
+
+</resources>
