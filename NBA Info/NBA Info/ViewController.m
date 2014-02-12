@@ -17,12 +17,12 @@
 - (void)viewDidLoad
 {
     
-    divisionsItems = (NSArray*)@[@"Southeast",@"Atlantic",@"Central",@"Southwest",@"Northwest",@"Pacific"];
+    divisionsItems = (NSArray*)@[@"--Select A Division--",@"Southeast",@"Atlantic",@"Central",@"Southwest",@"Northwest",@"Pacific"];
     
     //Get teams info
     NSData *nbaData = [[NSData alloc] initWithContentsOfURL:[NSURL URLWithString:@"https://erikberg.com/nba/teams.json"]];
     NSError *theError;
-    NSArray *theNBAInfo = [NSJSONSerialization JSONObjectWithData:nbaData options:kNilOptions error:&theError];
+    theNBAInfo = [NSJSONSerialization JSONObjectWithData:nbaData options:kNilOptions error:&theError];
     
     if(theError)
     {
@@ -111,7 +111,15 @@
 
 -(NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component
 {
+    
     return [divisionsItems objectAtIndex:row];
+}
+
+- (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component{
+    selectedDivision = [divisionsItems objectAtIndex:row];
+    
+    NSLog(@"%@", selectedDivision);
+    
 }
 
 //Get the data from SQLite database
@@ -123,10 +131,11 @@
     
     if (sqlite3_open(DatabasePath, &SQLinfo) == SQLITE_OK)
     {
+        
         //String from East West selector
         EWTxt = [NSString stringWithFormat: @"%@",[EWSelect titleForSegmentAtIndex:EWSelect.selectedSegmentIndex]];
         
-        NSString *querySQL = [NSString stringWithFormat:@"SELECT * FROM TeamInfo WHERE CONFERENCE='%@'",EWTxt];
+        NSString *querySQL = [NSString stringWithFormat:@"SELECT * FROM TeamInfo WHERE CONFERENCE='%@' AND DIVISION='%@'",EWTxt,selectedDivision];
         
         const char *query_stmt = [querySQL UTF8String];
         
@@ -151,6 +160,7 @@
         sqlite3_close(SQLinfo);
     }
 }
+
 
 //Begin query function
 -(IBAction)onQuery:(id)sender{

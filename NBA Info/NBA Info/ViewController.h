@@ -15,6 +15,8 @@
     IBOutlet UITableView *teamsList;
     IBOutlet UIButton *beginQuery;
     IBOutlet UISegmentedControl *EWSelect;
+    NSArray *theNBAInfo;
+    NSString *selectedDivision;
     NSArray *divisionsItems;
     NSString *SQLPath;
     NSString *EntryAddedStatus;
