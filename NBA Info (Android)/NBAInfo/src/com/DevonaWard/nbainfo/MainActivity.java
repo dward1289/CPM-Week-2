@@ -14,6 +14,9 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.util.Log;
 import android.view.Menu;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 
 
 
@@ -35,7 +38,10 @@ public class MainActivity extends Activity {
 	ArrayList<String>DivisionList = new ArrayList<String>();
 	ArrayList<String>ConferenceList = new ArrayList<String>();
 	ArrayList<String>ArenaList = new ArrayList<String>();
+	ArrayList<String>SQLiteList = new ArrayList<String>();
 	SQLHandler SQL = new SQLHandler(this);
+	ListView theListView;
+	List<Team> teams;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +51,13 @@ public class MainActivity extends Activity {
         
         LoadJSON loadJSON = new LoadJSON();
 		loadJSON.execute();
+		
+		ListView lv = (ListView) findViewById(R.id.list);
+
+	    ArrayAdapter<String> simpleAdpt = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, SQLiteList);
+
+	    lv.setAdapter(simpleAdpt);
+		
     }
 
     private class LoadJSON extends AsyncTask<String, Void, String> {
@@ -107,13 +120,23 @@ public class MainActivity extends Activity {
 
 	    @Override
         protected void onPostExecute(String result){
+	    	int n = AbbreviationList.size();
+	    	for(int i=0; i<n; i++ ){
 	  
-	    		SQL.addTeam(new Team(AbbreviationList.get(0), FullNameList.get(0), CityList.get(0),StateList.get(0), ConferenceList.get(0), DivisionList.get(0), ArenaList.get(0)));
+	    		SQL.addTeam(new Team(AbbreviationList.get(i), FullNameList.get(i), CityList.get(i),StateList.get(i), ConferenceList.get(i), DivisionList.get(i), ArenaList.get(i)));
+	    	}
 	    	
-	    	List<Team> teams = SQL.getTeams();      
-	         
-	      
-	        Log.d("DATA IN SQLite: ", teams.toString());
+	    	teams = SQL.getTeams();  
+	    	for (Team TI : teams) {
+	            String log = "("+ TI.getAbbreviation() + ") " +TI.getName() + "\n" + TI.getCity() + ", " + 
+	    	TI.getState() + "\n" + "Conference: "+ TI.getConference() + "\n" + "Divison: " + TI.getDivision() + "\n" + "Arena: " + TI.getArena();
+
+	            // Writing SQL to log
+	            Log.i("SQLite Working", log);   
+	            
+	            SQLiteList.add(log);
+	    }
+	    	 
         
 	}
 }

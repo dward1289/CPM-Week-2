@@ -40,8 +40,9 @@ public class SQLHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String CREATE_TEAMINFO_TABLE = "CREATE TABLE " + TABLE_TEAMS + "("
                 + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + TEAM_ABBREVIATION + " TEXT,"
-                + TEAM_NAME + " TEXT," + TEAM_STATE + "TEXT," + TEAM_CITY + "TEXT," + TEAM_DIVISION + "TEXT,"
-                + TEAM_CONFERENCE + "TEXT," + TEAM_ARENA + "TEXT" +")";
+                + TEAM_NAME + " TEXT," + TEAM_STATE + " TEXT," + TEAM_CITY + " TEXT," + TEAM_DIVISION + " TEXT,"
+                + TEAM_CONFERENCE + " TEXT," + TEAM_ARENA + " TEXT" +")";
+        
         db.execSQL(CREATE_TEAMINFO_TABLE);
     }
  
