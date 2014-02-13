@@ -20,11 +20,22 @@
         android:text="@string/west"/>
     </RadioGroup>
 
-    <ListView
-      	android:id="@+id/list"
+    <TextView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_width="match_parent">
+        android:background="#000000" />
+    
+    <ListView
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="354dp" >
+
      </ListView>
+
+	<TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#000000" />
      
     <Spinner 
         android:id="@+id/spinner"

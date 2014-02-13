@@ -16,7 +16,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
+
 
 
 
@@ -52,11 +52,10 @@ public class MainActivity extends Activity {
         LoadJSON loadJSON = new LoadJSON();
 		loadJSON.execute();
 		
-		ListView lv = (ListView) findViewById(R.id.list);
-
+		//Add SQL DB data to list
+		theListView = (ListView) findViewById(R.id.list);
 	    ArrayAdapter<String> simpleAdpt = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, SQLiteList);
-
-	    lv.setAdapter(simpleAdpt);
+	    theListView.setAdapter(simpleAdpt);
 		
     }
 
@@ -87,7 +86,7 @@ public class MainActivity extends Activity {
                      JSONArray jsonArray = new JSONArray(responseBuffer.toString());
                      
                      int n = jsonArray.length();
-                     //Add data to array list
+                     //Add JSON data to array list
                      for(int i = 0;i<n; i++){
                              JSONObject jsonObject = jsonArray.getJSONObject(i);
 
@@ -120,21 +119,25 @@ public class MainActivity extends Activity {
 
 	    @Override
         protected void onPostExecute(String result){
+	    	
+	    	//Add data to SQL DB
 	    	int n = AbbreviationList.size();
 	    	for(int i=0; i<n; i++ ){
 	  
 	    		SQL.addTeam(new Team(AbbreviationList.get(i), FullNameList.get(i), CityList.get(i),StateList.get(i), ConferenceList.get(i), DivisionList.get(i), ArenaList.get(i)));
 	    	}
 	    	
+	    	//Get data from SQL DB
 	    	teams = SQL.getTeams();  
 	    	for (Team TI : teams) {
-	            String log = "("+ TI.getAbbreviation() + ") " +TI.getName() + "\n" + TI.getCity() + ", " + 
+	            String theData = "("+ TI.getAbbreviation() + ") " +TI.getName() + "\n" + TI.getCity() + ", " + 
 	    	TI.getState() + "\n" + "Conference: "+ TI.getConference() + "\n" + "Divison: " + TI.getDivision() + "\n" + "Arena: " + TI.getArena();
 
 	            // Writing SQL to log
-	            Log.i("SQLite Working", log);   
+	            Log.i("SQLite Working", theData);   
 	            
-	            SQLiteList.add(log);
+	            //Add data to array list.
+	            SQLiteList.add(theData);
 	    }
 	    	 
         
