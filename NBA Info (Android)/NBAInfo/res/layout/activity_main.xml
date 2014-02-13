@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <RadioGroup
+    <RadioGroup android:id="@+id/radio_group"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal">
@@ -12,12 +12,21 @@
     <RadioButton android:id="@+id/radio_east"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/east"/>
+        android:text="@string/east"
+        />
     
     <RadioButton android:id="@+id/radio_west"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/west"/>
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/query"
+        android:layout_marginLeft="40dp"/>
+
     </RadioGroup>
 
     <TextView

@@ -12,10 +12,17 @@ import org.json.JSONObject;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteException;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
 
 
 
@@ -39,23 +46,43 @@ public class MainActivity extends Activity {
 	ArrayList<String>ConferenceList = new ArrayList<String>();
 	ArrayList<String>ArenaList = new ArrayList<String>();
 	ArrayList<String>SQLiteList = new ArrayList<String>();
+	ArrayList<String>QueryList = new ArrayList<String>();
 	SQLHandler SQL = new SQLHandler(this);
 	ListView theListView;
 	List<Team> teams;
-	
+	RadioButton radioEW;
+	RadioGroup EWGroup;
+	String EWtxt;
+	Spinner divisionSpinner;
+	String spinnerTxt;
+	Button button;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
+        //Get radio group
+        EWGroup = (RadioGroup) findViewById(R.id.radio_group); 
+        //Get spinner
+        divisionSpinner = (Spinner) findViewById(R.id.spinner);
         
+        //Load JSON data file        
         LoadJSON loadJSON = new LoadJSON();
 		loadJSON.execute();
 		
+		//Get button
+		button = (Button) findViewById(R.id.button1);
+		//Execute the query
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+            	openAndQueryDatabase();
+            }
+        });
+		
+		
 		//Add SQL DB data to list
 		theListView = (ListView) findViewById(R.id.list);
-	    ArrayAdapter<String> simpleAdpt = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, SQLiteList);
-	    theListView.setAdapter(simpleAdpt);
+	    
 		
     }
 
@@ -132,18 +159,58 @@ public class MainActivity extends Activity {
 	    	for (Team TI : teams) {
 	            String theData = "("+ TI.getAbbreviation() + ") " +TI.getName() + "\n" + TI.getCity() + ", " + 
 	    	TI.getState() + "\n" + "Conference: "+ TI.getConference() + "\n" + "Divison: " + TI.getDivision() + "\n" + "Arena: " + TI.getArena();
-
-	            // Writing SQL to log
-	            Log.i("SQLite Working", theData);   
-	            
+          	            
 	            //Add data to array list.
 	            SQLiteList.add(theData);
 	    }
 	    	 
-        
+	    	// Writing SQL to log
+            Log.i("SQLite Working", "DATA ADDED TO SQL DB.");
 	}
 }
 
+    
+    private void openAndQueryDatabase() {
+    	//Clear QueryList if it contains data.
+    	if(QueryList.size() != 0){
+    		QueryList.removeAll(QueryList);
+    	}
+    	//Get selected id of radio button
+        int selected = EWGroup.getCheckedRadioButtonId();
+        //Get selected button
+        radioEW = (RadioButton) findViewById(selected);
+        //Text of selected radio button
+        EWtxt = radioEW.getText().toString();
+        //Get spinner text
+        spinnerTxt = divisionSpinner.getSelectedItem().toString();
+        try {
+            SQL.getWritableDatabase();
+            Cursor cursor = SQL.getWritableDatabase().rawQuery("SELECT  * FROM Teams WHERE conference='"+EWtxt+"' AND division='"+spinnerTxt+"'",null);
+ 
+            if (cursor != null ) {
+                if  (cursor.moveToFirst()) {
+                    do {
+                        String teamAbbreviation = (cursor.getString(1));
+                        String teamName = (cursor.getString(2));
+                        String teamCity = (cursor.getString(3));
+                        String teamState = (cursor.getString(4));
+                        String teamDivision = (cursor.getString(5));
+                        String teamConference = (cursor.getString(6));
+                        String teamArena = (cursor.getString(7));
+                        QueryList.add("("+ teamAbbreviation+ ") " +teamName+ "\n" + teamCity + ", " + 
+                    	    	teamState + "\n" + "Conference: "+ teamConference + "\n" + "Divison: " + teamDivision + "\n" + "Arena: " + teamArena);
+                    }while (cursor.moveToNext());
+                } 
+            }
+            //Check data in QueryList
+            Log.i("THE REAL QUERY", "QUERY HAS BEEN COMPLETED.");
+            //Populate list view with query data.
+            ArrayAdapter<String> simpleAdpt = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, QueryList);
+    	    theListView.setAdapter(simpleAdpt);
+        } catch (SQLiteException se ) {
+            Log.e(getClass().getSimpleName(), "Could not create or Open the database");
+        } 
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
