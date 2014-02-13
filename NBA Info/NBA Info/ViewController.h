@@ -9,12 +9,13 @@
 #import <UIKit/UIKit.h>
 #import <sqlite3.h>
 
-@interface ViewController : UIViewController
+@interface ViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
 {
     IBOutlet UIPickerView *divisionsList;
     IBOutlet UITableView *teamsList;
     IBOutlet UIButton *beginQuery;
     IBOutlet UISegmentedControl *EWSelect;
+    NSString *theInfo;
     NSArray *theNBAInfo;
     NSString *selectedDivision;
     NSArray *divisionsItems;
